@@ -6,7 +6,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/jeremiehuchet/go-through-proxies/xnet"
+	"github.com/jeremiehuchet/get-rid-of-proxies/xnet"
 )
 
 // Proxy describes how to contact proxy server
@@ -23,7 +23,7 @@ type DirectProxy struct {
 type HTTPProxy struct {
 	Proxy
 	host string
-	port int
+	port uint16
 }
 
 func (p DirectProxy) Forward(conn *xnet.Connection) {

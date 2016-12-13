@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/jeremiehuchet/go-through-proxies/proxy"
-	"github.com/jeremiehuchet/go-through-proxies/xnet"
+	"github.com/jeremiehuchet/get-rid-of-proxies/proxy"
+	"github.com/jeremiehuchet/get-rid-of-proxies/xnet"
 	"github.com/spf13/viper"
 )
 
