@@ -1,6 +1,9 @@
-# get rid of proxies
+# transprouter
 
 Configure once and for all your f proxy.
+
+[![codecov](https://codecov.io/gh/transprouter/transprouter/branch/master/graph/badge.svg)](https://codecov.io/gh/transprouter/transprouter)
+[![Build Status](https://travis-ci.org/transprouter/transprouter.svg?branch=master)](https://travis-ci.org/transprouter/transprouter)
 
 ## Testing notes
 
