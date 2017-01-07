@@ -1,5 +1,5 @@
 FROM alpine
-RUN apk add --no-cache openssh
+RUN apk add --no-cache --quiet openssh
 RUN echo "PermitEmptyPasswords yes" >> /etc/ssh/sshd_config \
  && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
  && echo "root:" | chpasswd

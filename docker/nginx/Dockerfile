@@ -1,5 +1,5 @@
 FROM nginx:stable-alpine
-RUN apk add --no-cache openssl
+RUN apk add --no-cache --quiet openssl
 RUN rm -rf /etc/nginx/conf.d \
  && mkdir -p /etc/nginx/conf.d /etc/nginx/ssl \
  && openssl req -x509 -newkey rsa:4096 \
