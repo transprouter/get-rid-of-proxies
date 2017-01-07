@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/jeremiehuchet/get-rid-of-proxies/xnet"
+	"github.com/transprouter/transprouter/xnet"
 
 	"bufio"
 

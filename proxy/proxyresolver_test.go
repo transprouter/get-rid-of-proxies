@@ -9,7 +9,7 @@ import (
 
 	"bytes"
 
-	"github.com/jeremiehuchet/get-rid-of-proxies/xnet"
+	"github.com/transprouter/transprouter/xnet"
 )
 
 func tTestCanForwardDirectly(t *testing.T) {

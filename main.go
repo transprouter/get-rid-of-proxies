@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/jeremiehuchet/get-rid-of-proxies/proxy"
-	"github.com/jeremiehuchet/get-rid-of-proxies/xnet"
+	"github.com/transprouter/transprouter/proxy"
+	"github.com/transprouter/transprouter/xnet"
 	"github.com/spf13/viper"
 )
 
 func main() {
 	viper.SetConfigName("config")
-	viper.AddConfigPath("/etc/get-rid-of-proxies")
+	viper.AddConfigPath("/etc/transprouter")
 	err := viper.ReadInConfig()
 
 	if err != nil {
