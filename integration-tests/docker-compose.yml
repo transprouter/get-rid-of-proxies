@@ -8,6 +8,14 @@ services:
     - "2222:22"
     networks:
     - local
+    dns: 172.71.0.101
+
+  dns:
+    build: docker/dns
+    networks:
+      local:
+        ipv4_address: 172.71.0.101
+      away:
 
   proxy:
     build: docker/squid
@@ -40,5 +48,8 @@ services:
 networks:
 
   local:
+    ipam:
+      config:
+      - subnet: 172.71.0.0/24
 
   away:
