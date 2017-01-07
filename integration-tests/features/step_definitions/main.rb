@@ -11,8 +11,8 @@ Given(/^my system hasn't transprouter$/) do
 end
 
 Given(/^a web resource (https?:.+) is not accessible$/) do |url|
-  body = sshexec("curl #{url}")
-  expect(body).to eq("curl: (6) Couldn't resolve host 'web.away'\n")
+  body = sshexec("curl -sSk --max-time 5 #{url}")
+  expect(body).to start_with("curl: (28) Connection timed out after ")
 end
 
 When(/^my system has transprouter$/) do
@@ -21,7 +21,7 @@ end
 
 When(/^I access web resource (https?:.+)$/) do |url|
   Net::SSH.start('localhost', @user, :port => 2222) do |ssh|
-    @http_response_body = ssh.exec!("curl --silent #{url}")
+    @http_response_body = ssh.exec!("curl -sSk #{url}")
   end
 end
 
@@ -30,8 +30,8 @@ Then(/^the request response body contain$/) do |expected_body|
 end
 
 Given(/^a SSH service on (.+) is is not accessible$/) do |host|
-  output = sshexec("ssh root@#{host} true")
-  expect(output).to eq("ssh: Could not resolve hostname #{host}: Name or service not known\r\n")
+  output = sshexec("ssh -o ConnectTimeout=5 root@#{host} true")
+  expect(output).to eq("ssh: connect to host #{host} port 22: Connection timed out\r\n")
 end
 
 When(/^I execute "([^"]*)" on (.+)$/) do |cmd, host|
