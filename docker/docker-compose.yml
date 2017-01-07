@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+
+  workstation:
+    build: workstation
+    ports:
+    - "2222:22"
+    networks:
+    - local
+
+  proxy:
+    build: squid
+    networks:
+    - local
+    - away
+
+  web.local:
+    build: nginx
+    command: You are on a direct webserver!
+    networks:
+    - local
+
+  web.away:
+    build: nginx
+    command: You are on a proxied webserver!
+    networks:
+    - away
+
+  ssh.local:
+    build: openssh
+    networks:
+    - local
+
+  ssh.away:
+    build: openssh
+    networks:
+    - away
+
+networks:
+
+  local:
+
+  away:
