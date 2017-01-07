@@ -115,7 +115,7 @@ func inspectProtocol(r io.Reader) (string, io.Reader) {
 	safe := io.TeeReader(r, consumed)
 	http := isHTTP(safe)
 	if http {
-		return "http", io.MultiReader(consumed, r)
+		return "HTTP", io.MultiReader(consumed, r)
 	}
 	return "unknown", io.MultiReader(consumed, r)
 }

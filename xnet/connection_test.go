@@ -10,7 +10,7 @@ func TestInspectCanDetectHTTP(t *testing.T) {
 	data := "GET /home HTTP/1.1"
 	r := strings.NewReader(data)
 	protocol, _ := inspectProtocol(r)
-	if protocol != "http" {
+	if protocol != "HTTP" {
 		t.Error("Expecting HTTP protocol")
 	}
 }
