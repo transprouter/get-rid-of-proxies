@@ -11,7 +11,7 @@ import (
 
 func main() {
 	viper.SetConfigName("config")
-	viper.AddConfigPath("/etc/go-through-proxies")
+	viper.AddConfigPath("/etc/get-rid-of-proxies")
 	err := viper.ReadInConfig()
 
 	if err != nil {
@@ -20,7 +20,7 @@ func main() {
 
 	viper.SetDefault("pac.url", "http://localhost:80/proxy.pac")
 
-	lnaddr, err := net.ResolveTCPAddr("tcp", ":3128")
+	lnaddr, err := net.ResolveTCPAddr("tcp", ":3129")
 
 	ln, err := net.ListenTCP("tcp", lnaddr)
 	if err != nil {
@@ -38,8 +38,8 @@ func main() {
 func handleConnection(conn *net.TCPConn) {
 
 	connInfo := xnet.Inspect(conn)
-	fmt.Printf("Connection( %s )\n", connInfo)
 
-	p := new(proxy.DirectProxy)
+	//p := new(proxy.DirectProxy)
+	p := proxy.NewHTTPProxy("172.19.0.2", 3128)
 	p.Forward(connInfo)
 }

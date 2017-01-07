@@ -12,22 +12,47 @@ import (
 
 // Dest holds connection destination information
 type Dest struct {
-	host string
-	port uint16
+	Host string
+	Port uint16
 }
 
 func (d Dest) String() string {
-	return fmt.Sprintf("%s:%d", d.host, d.port)
+	return fmt.Sprintf("%s:%d", d.Host, d.Port)
+}
+
+type TCPReadCloser interface {
+	io.Reader
+	CloseRead() error
+}
+
+type TCPWriteCloser interface {
+	io.Writer
+	CloseWrite() error
 }
 
 // Connection holds addional information about the output connection request.
 type Connection struct {
-	io.Closer
+	io.ReadWriteCloser
+	TCPReadCloser
+	TCPWriteCloser
 	originalConn *net.TCPConn
-	protocol     string
-	dest         Dest
+	Protocol     string
+	Dest         Dest
 	reader       io.Reader
-	writer       io.WriteCloser
+	writer       io.Writer
+}
+
+// FIXME how to mock without shipping this test code?
+func MockConnection(host string, port uint16, r io.Reader, w io.Writer) *Connection {
+	c := new(Connection)
+	c.originalConn = new(net.TCPConn)
+	c.Dest = Dest{
+		Host: host,
+		Port: port,
+	}
+	c.Protocol, c.reader = inspectProtocol(r)
+	c.writer = w
+	return c
 }
 
 // Inspect the given net.TCPConn.
@@ -35,40 +60,35 @@ type Connection struct {
 func Inspect(conn *net.TCPConn) *Connection {
 	c := new(Connection)
 	c.originalConn = conn
-	c.dest = *new(Dest)
-	c.dest.host, c.dest.port = originalDestination(conn)
-	c.protocol, c.reader = inspectProtocol(conn)
-	c.writer = NewTCPWriteCloser(conn)
+	c.Dest = *new(Dest)
+	c.Dest.Host, c.Dest.Port = originalDestination(conn)
+	c.Protocol, c.reader = inspectProtocol(conn)
+	c.writer = conn
 	return c
 }
 
 func (c Connection) String() string {
-	return fmt.Sprintf("%s://%s", c.protocol, c.dest.String())
+	return fmt.Sprintf("%s://%s", c.Protocol, c.Dest.String())
 }
 
-// Destination returns the original destination of the connection.
-func (c Connection) Destination() Dest {
-	return c.dest
+func (c Connection) Read(p []byte) (n int, err error) {
+	return c.reader.Read(p)
 }
 
-// Protocol return the connection protocol the data seems to refer to.
-func (c Connection) Protocol() string {
-	return c.protocol
+func (c Connection) Write(p []byte) (n int, err error) {
+	return c.writer.Write(p)
 }
 
-// Reader returns an io.Reader to read the data the connection want to transmit.
-func (c Connection) Reader() io.Reader {
-	return c.reader
-}
-
-// WriteCloser returns an io.WriteCloser to write the response data.
-func (c Connection) WriteCloser() io.WriteCloser {
-	return c.writer
-}
-
-// Close the opened resources.
 func (c Connection) Close() error {
 	return c.originalConn.Close()
+}
+
+func (c Connection) CloseRead() error {
+	return c.originalConn.CloseRead()
+}
+
+func (c Connection) CloseWrite() error {
+	return c.originalConn.CloseWrite()
 }
 
 const soOriginalDest = 80
@@ -95,7 +115,7 @@ func inspectProtocol(r io.Reader) (string, io.Reader) {
 	safe := io.TeeReader(r, consumed)
 	http := isHTTP(safe)
 	if http {
-		return "http", io.MultiReader(consumed, r)
+		return "HTTP", io.MultiReader(consumed, r)
 	}
 	return "unknown", io.MultiReader(consumed, r)
 }

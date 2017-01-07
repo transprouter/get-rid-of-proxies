@@ -4,9 +4,14 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"sync"
 
 	"github.com/jeremiehuchet/get-rid-of-proxies/xnet"
+
+	"bufio"
+
+	"strings"
 )
 
 // Proxy describes how to contact proxy server
@@ -28,47 +33,85 @@ type HTTPProxy struct {
 
 func (p DirectProxy) Forward(conn *xnet.Connection) {
 	defer conn.Close()
-	remoteConn, err := net.Dial("tcp", conn.Destination().String())
+	remoteConn, err := net.Dial("tcp", conn.Dest.String())
 	defer remoteConn.Close()
 	if err != nil {
-		fmt.Printf("ERROR opening connection with %s\n", conn.Destination())
+		fmt.Printf("ERROR opening connection with %s\n", conn.Dest)
 		return
 	}
-	pipe(conn, remoteConn)
+	pipe(conn, remoteConn.(*net.TCPConn))
+}
+
+func NewHTTPProxy(host string, port uint16) *HTTPProxy {
+	p := new(HTTPProxy)
+	p.host = host
+	p.port = port
+	return p
 }
 
 func (p HTTPProxy) Forward(conn *xnet.Connection) {
-	proxyConn, err := net.Dial("tcp", conn.Destination().String())
+	proxyConn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", p.host, p.port))
 	if err != nil {
-		fmt.Printf("ERROR opening connection with proxy at %s:%d\n", p.host, p.port)
+		fmt.Printf("ERROR opening connection with proxy at %s:%d: %s\n", p.host, p.port, err)
+		return
 	}
-	// http ? or connect ?
-	proxyConn.Write(nil)
-	pipe(conn, proxyConn)
+	fmt.Println(".")
+	if conn.Protocol == "HTTP" {
+		// forward raw request
+		req, err := http.ReadRequest(bufio.NewReader(conn))
+		if err != nil {
+			fmt.Printf("ERROR Parsing HTTP request: %s\n", err)
+		}
+		req.URL.Scheme = "http"
+		req.WriteProxy(proxyConn)
+		pipe(conn, proxyConn.(*net.TCPConn))
+		fmt.Println("Forwarded as HTTP")
+	} else {
+		// use CONNECT
+		connect := fmt.Sprintf("CONNECT %s HTTP/1.1\r\nHost: %s\r\n\r\n", conn.Dest, conn.Dest)
+		fmt.Printf("forwarding using %s", connect)
+		_, err := fmt.Fprintf(proxyConn, connect)
+		if err != nil {
+			fmt.Printf("ERROR sending CONNECT command to proxy at %s:%d: %s\n", p.host, p.port, err)
+			return
+		}
+		status, err := bufio.NewReader(proxyConn).ReadString('\n')
+		if err != nil {
+			fmt.Printf("ERROR unreadable response from proxy at %s:%d: %s\n", p.host, p.port, err)
+			return
+		}
+		if !strings.Contains(status, "200") {
+			fmt.Printf("ERROR CONNECT command refused by proxy at %s:%d: %s\n", p.host, p.port, status)
+			return
+		}
+		pipe(conn, proxyConn.(*net.TCPConn))
+		fmt.Println("Forwarded using CONNECT")
+	}
 }
 
-func pipe(local *xnet.Connection, remote net.Conn) {
+func pipe(local *xnet.Connection, remote *net.TCPConn) {
 	defer local.Close()
 	defer remote.Close()
 
 	var wg sync.WaitGroup
-	wg.Add(2)
-	// pipe downstream
-	go cp(local.WriteCloser(), remote, &wg)
-	// pipe upstream
-	closeableRemoteDest := xnet.NewTCPWriteCloser(remote.(*net.TCPConn))
-	go cp(closeableRemoteDest, local.Reader(), &wg)
-	wg.Wait()
-}
-
-func cp(dst io.WriteCloser, src io.Reader, wg *sync.WaitGroup) (written int64, err error) {
-	defer dst.Close()
-	defer wg.Done()
-	written, err = io.Copy(dst, src)
-	if err != nil {
-		fmt.Printf("Error forwarding data: %s\n", err)
+	cp := func(dst xnet.TCPWriteCloser, src io.Reader) (written int64, err error) {
+		defer wg.Done()
+		defer dst.CloseWrite()
+		written, err = io.Copy(dst, src)
+		if err != nil {
+			fmt.Printf("Error forwarding data: %s\n", err)
+		}
+		return
 	}
-	return
+
+	wg.Add(2)
+
+	// pipe downstream
+	go cp(local, remote)
+	// pipe upstream
+	go cp(remote, local)
+
+	wg.Wait()
 }
 
 // Resolver help finding the proxy server to use to contact a given host
