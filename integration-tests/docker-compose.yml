@@ -3,37 +3,37 @@ version: '2'
 services:
 
   workstation:
-    build: workstation
+    build: docker/workstation
     ports:
     - "2222:22"
     networks:
     - local
 
   proxy:
-    build: squid
+    build: docker/squid
     networks:
     - local
     - away
 
   web.local:
-    build: nginx
+    build: docker/nginx
     command: You are on a direct webserver!
     networks:
     - local
 
   web.away:
-    build: nginx
+    build: docker/nginx
     command: You are on a proxied webserver!
     networks:
     - away
 
   ssh.local:
-    build: openssh
+    build: docker/openssh
     networks:
     - local
 
   ssh.away:
-    build: openssh
+    build: docker/openssh
     networks:
     - away
 

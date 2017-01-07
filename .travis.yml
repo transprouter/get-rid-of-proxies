@@ -6,7 +6,7 @@ services:
 
 before_install:
 - echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config
-- docker-compose -f integration-tests/docker/docker-compose.yml -p test up -d --build
+- sh -c "cd integration-tests && docker-compose up -d --build"
 - rvm use 2
 - bundle install --gemfile integration-tests/Gemfile
 
@@ -16,9 +16,11 @@ before_script:
 
 script:
 - go test -v ./...
-- go build
-- scp -P 2222 transprouter transprouter@localhost
-- cd integration-tests && bundle exec cucumber
+- go build && scp -P 2222 transprouter transprouter@localhost:~
+- sh -c "cd integration-tests && bundle exec cucumber"
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
+
+after_failure:
+- sh -c "cd integration-tests && docker-compose logs"
