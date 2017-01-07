@@ -5,9 +5,15 @@ services:
 - docker
 
 before_install:
-- git clone --depth 1 https://github.com/transprouter/integration-tests.git
+- echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config
 - docker-compose -f integration-tests/docker/docker-compose.yml -p test up -d --build
 
 before_script:
 - docker ps
-- for i in $(seq 0 30) ; do sleep 1 && ssh root@localhost -p 2222 -o StrictHostKeyChecking=no true && break ; done
+- for i in $(seq 0 30) ; do sleep 1 && ssh root@localhost -p 2222 true && break ; done
+
+script:
+- go test -v ./...
+- go build
+- scp -p 2222 transprouter transprouter@localhost:/opt/transprouter/transprouter
+- bundle exec cucumber
