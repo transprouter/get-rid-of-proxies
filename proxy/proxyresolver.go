@@ -89,14 +89,13 @@ func (p HTTPProxy) Forward(conn *xnet.Connection) {
 	}
 }
 
-func pipe(local *xnet.Connection, remote *net.TCPConn) {
+func pipe(local io.ReadWriteCloser, remote io.ReadWriteCloser) {
 	defer local.Close()
 	defer remote.Close()
 
 	var wg sync.WaitGroup
-	cp := func(dst xnet.TCPWriteCloser, src io.Reader) (written int64, err error) {
+	cp := func(dst io.WriteCloser, src io.Reader) (written int64, err error) {
 		defer wg.Done()
-		defer dst.CloseWrite()
 		written, err = io.Copy(dst, src)
 		if err != nil {
 			fmt.Printf("Error forwarding data: %s\n", err)
