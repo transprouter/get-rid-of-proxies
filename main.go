@@ -40,6 +40,6 @@ func handleConnection(conn *net.TCPConn) {
 	connInfo := xnet.Inspect(conn)
 
 	//p := new(proxy.DirectProxy)
-	p := proxy.NewHTTPProxy("172.19.0.2", 3128)
+	p := proxy.NewHTTPProxy("proxy", 3128)
 	p.Forward(connInfo)
 }
