@@ -7,6 +7,8 @@ services:
 before_install:
 - echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config
 - docker-compose -f integration-tests/docker/docker-compose.yml -p test up -d --build
+- rvm use 2
+- bundle install --gemfile integration-tests/Gemfile
 
 before_script:
 - docker ps
@@ -15,5 +17,5 @@ before_script:
 script:
 - go test -v ./...
 - go build
-- scp -p 2222 transprouter transprouter@localhost:/opt/transprouter/transprouter
-- bundle exec cucumber
+- scp -P 2222 transprouter transprouter@localhost
+- cd integration-tests && bundle exec cucumber
