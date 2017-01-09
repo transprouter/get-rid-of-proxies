@@ -94,7 +94,9 @@ func pipe(local io.ReadWriteCloser, remote io.ReadWriteCloser) {
 	defer remote.Close()
 
 	var wg sync.WaitGroup
-	cp := func(dst io.WriteCloser, src io.Reader) (written int64, err error) {
+	wg.Add(2)
+
+	cp := func(dst io.WriteCloser, src io.ReadCloser) (written int64, err error) {
 		defer wg.Done()
 		written, err = io.Copy(dst, src)
 		if err != nil {
@@ -102,8 +104,6 @@ func pipe(local io.ReadWriteCloser, remote io.ReadWriteCloser) {
 		}
 		return
 	}
-
-	wg.Add(2)
 
 	// pipe downstream
 	go cp(local, remote)

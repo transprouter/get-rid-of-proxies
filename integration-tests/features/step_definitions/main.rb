@@ -27,7 +27,7 @@ Then(/^a HTTP timeout error occurred$/) do
 end
 
 When(/^I execute "([^"]*)" on (.+)$/) do |cmd, host|
-  @command_output = sshexec(@user, "ssh -o ConnectTimeout=15 root@#{host} #{cmd}")
+  @command_output = sshexec(@user, "ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@#{host} #{cmd}")
 end
 
 Then(/^the command output is$/) do |expected_output|

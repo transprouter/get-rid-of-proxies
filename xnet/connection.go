@@ -49,8 +49,8 @@ func Inspect(conn *net.TCPConn) *Connection {
 	c := new(Connection)
 	c.Dest = *new(Dest)
 	c.originalConn, c.Dest = originalDestination(conn)
-	c.Protocol, c.reader = inspectProtocol(conn)
-	c.writer = conn
+	c.Protocol, c.reader = inspectProtocol(c.originalConn)
+	c.writer = c.originalConn
 	return c
 }
 
@@ -73,8 +73,9 @@ func (c Connection) Close() error {
 const soOriginalDest = 80
 
 func originalDestination(conn *net.TCPConn) (newConn *net.TCPConn, dest Dest) {
+	defer conn.Close()
 	connFile, err := conn.File()
-	//defer connFile.Close()
+	defer connFile.Close()
 	if err != nil {
 		fmt.Printf("Unable to obtain unterdying os.File: %s\n", err)
 		return
