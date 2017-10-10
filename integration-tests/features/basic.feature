@@ -8,17 +8,17 @@ Feature: Access network resources transparently
     When I request the web resource at <url>
     Then the HTTP reponse body contains
     """
-    You are on a proxied webserver!
+    Welcome to nginx!
     """
 
     Examples:
-    | url                   |
-    | http://web.away/lost  |
-    | https://web.away/lost |
+    | url          |
+    | http://srv1  |
+    | https://srv2 |
 
   Scenario: Connecting to remote SSH server
     Given my system has transprouter
-    When I execute "echo -n hello world" on ssh.away
+    When I execute "echo -n hello world" on srv1
     Then the command output is
     """
     hello world

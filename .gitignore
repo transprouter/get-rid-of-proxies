@@ -1,2 +1,5 @@
+/.vagrant/
 /.vscode/
 /transprouter
+*.log
+*.pyc
