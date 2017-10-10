@@ -11,7 +11,7 @@ def step(context):
 
 @when('I request the web resource at {url}')
 def step(context, url):
-    context.response_body = context.host.cmd('curl -iv -sSk --max-time 5 ' + url)
+    context.response_body = context.host.cmd('curl -iv -sSk --max-time 5 %s' % url)
 
 @then('the HTTP reponse body contains')
 def step(context):
@@ -24,7 +24,7 @@ def step(context):
 
 @when('I execute "{command}" on {host}')
 def step( context, command, host ):
-    context.command_output = context.host.cmd('ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@%s %s' % (host, command) )
+    context.command_output = context.host.cmd('ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@$(echo %s ) %s' % (host, command) )
 
 @then('the command output is')
 def step( context ):
