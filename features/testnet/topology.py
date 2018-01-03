@@ -10,12 +10,39 @@ from mininet.log import setLogLevel
 from shutil import copytree
 from tempfile import mkdtemp
 
-class Server( Host ):
+class BaseHost ( Host ):
+    """
+    A base host definition with common setup for tests
+    """
+    def __init__( self, name, privateDirs=[], dns=None, **params ):
+        self.root_dir = mkdtemp( prefix='%s-' % name )
+        copytree( '/etc', '%s/etc' % self.root_dir )
+        privateDirs = [
+            ( '/etc', '%s/etc' % self.root_dir )
+        ]
+        privateDirs += privateDirs
+        self.__configure_hosts( name )
+        if dns is not None:
+            self.__configure_dns( dns )
+        Host.__init__( self, name, privateDirs=privateDirs, **params )
+
+    def __configure_hosts( self, name ):
+        with open( '%s/etc/hostname' % self.root_dir, 'w' ) as f:
+            f.write( '%s\n' % name )
+        with open( '%s/etc/hosts' % self.root_dir, 'w' ) as f:
+            f.write( '127.0.0.1 localhost\n' )
+            f.write( '127.0.1.1 %s\n' % name )
+
+    def __configure_dns( self, dns ):
+        with open( '%s/etc/resolv.conf' % self.root_dir, 'w' ) as f:
+            f.write( 'nameserver %s\n' % dns )
+
+class Server( BaseHost ):
     """
     A node running some services
     """
-    def __init__( self, name, **kwargs ):
-        Host.__init__( self, name, **kwargs )
+    def __init__( self, name, **params ):
+        BaseHost.__init__( self, name, **params )
         self.services = []
 
     def service(self, cmd, port):
@@ -46,14 +73,8 @@ class DnsServer( Server ):
         ]
     """
     def __init__( self, name, **kwargs ):
-        self.temp_dir = mkdtemp( prefix='%s-' % name )
-        copytree( '/etc', '%s/etc' % self.temp_dir )
-        kwargs['privateDirs'] = [
-            ( '/etc', '%s/etc' % self.temp_dir )
-        ]
         Server.__init__( self, name, **kwargs )
-        with open( '%s/etc/hosts' % self.temp_dir, 'w' ) as f:
-            f.write( '127.0.0.1 localhost\n' )
+        with open( '%s/etc/hosts' % self.root_dir, 'a' ) as f:
             for host in kwargs['hosts']:
                 f.write( '%s %s\n' % (host['ip'], host['name']) )
 
@@ -96,7 +117,7 @@ class NetworkTopo( Topo ):
                 { 'name': 'ws2.local',  'ip': '192.168.35.12' }
             ]
         )
-        localServer1 = self.addHost( 'srv1', cls=Services, ip='192.168.35.10/24' )
+        localServer1 = self.addHost( 'srv1', cls=Services, ip='192.168.35.10/24', dns='192.168.35.2' )
         workstation1 = self.addHost( 'ws1', ip='192.168.35.11/24' )
         workstation2 = self.addHost( 'ws2', ip='192.168.35.12/24' )
 
