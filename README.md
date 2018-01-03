@@ -19,8 +19,14 @@ socat
 
     echo -e "GET /resource HTTP/1.1\r\n" | socat TCP4:somehost.tld:80 STDIO
 
-## integration-tests
+## functional tests
 
-Integration tests for transprouter are implemented with cucumber.
+Functional tests are implemented with cucumber (behave) and mininet.
 
-`Vagrantfile` at the root of this repository contains a convenient VM configuration with required test tools.
+A `Vagrantfile` at the root of this repository contains a convenient VM configuration with required test tools.
+
+**cheatsheet**
+
+- mininet requires root privileges
+- `sudo python testnet/topology.py` drops you into a shell to run mininet commands and test the network topology
+- `sudo behave basic.feature` runs a cucumber feature file
