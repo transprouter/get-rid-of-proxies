@@ -1,26 +1,14 @@
 language: go
 
 sudo: required
-services:
-- docker
 
 before_install:
-- echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config
-- sh -c "cd integration-tests && docker-compose up -d --build"
-- rvm use 2
-- bundle install --gemfile integration-tests/Gemfile
-
-before_script:
-- docker ps
-- for i in $(seq 0 30) ; do sleep 1 && ssh root@localhost -p 2222 true && break ; done
+- sudo ./Vagrantfile.provision.sh
 
 script:
 - go test -v ./...
-- go build && scp -P 2222 transprouter transprouter@localhost:~
-- sh -c "cd integration-tests && bundle exec cucumber"
+- go build
+- cd features && sudo behave _network_contraints.feature
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
-
-after_failure:
-- sh -c "cd integration-tests && docker-compose logs"

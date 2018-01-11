@@ -1,4 +1,4 @@
-Feature: Netword has constraints
+Feature: Network has constraints
 
   Scenario Outline: Some web resources are protected behind a proxy
     Given my system hasn't transprouter
