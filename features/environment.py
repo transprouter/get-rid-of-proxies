@@ -1,4 +1,4 @@
-from testnet import topology
+from network import topology
 
 def before_all(context):
     context.mn = topology.start()

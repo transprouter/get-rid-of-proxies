@@ -28,5 +28,5 @@ A `Vagrantfile` at the root of this repository contains a convenient VM configur
 **cheatsheet**
 
 - mininet requires root privileges
-- `sudo python testnet/topology.py` drops you into a shell to run mininet commands and test the network topology
+- `sudo python network/topology.py` drops you into a shell to run mininet commands and test the network topology
 - `sudo behave basic.feature` runs a cucumber feature file

@@ -7,8 +7,8 @@ Feature: Netword has constraints
 
     Examples:
     | url                   |
-    | http://web.away/lost  |
-    | https://web.away/lost |
+    | http://srv2.pub/lost  |
+    | https://srv2.pub/lost |
 
   Scenario Outline: Some web resources are accessible directly
     Given my system hasn't transprouter
@@ -19,18 +19,18 @@ Feature: Netword has constraints
     """
 
     Examples:
-    | url                   |
-    | http://web.local/lost  |
-    | https://web.local/lost |
+    | url                     |
+    | http://srv1.local/lost  |
+    | https://srv1.local/lost |
 
   Scenario: Some SSH servers are protected behind a proxy
     Given my system hasn't transprouter
-    When I execute "echo hello world" on ssh.away
+    When I execute "echo hello world" on srv2.pub
     Then a SSH timeout error occurred
 
   Scenario Outline: Some SSH servers are accessible directly
     Given my system hasn't transprouter
-    When I execute "echo -n hello world" on ssh.away
+    When I execute "echo -n hello world" on srv1.local
     Then the command output is
     """
     hello world
