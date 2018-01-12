@@ -7,6 +7,7 @@ from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.util import waitListening
 from mininet.log import setLogLevel
+from os import path
 from shutil import copytree
 from tempfile import mkdtemp
 
@@ -16,7 +17,7 @@ class BaseHost ( Host ):
     """
     def __init__( self, name, privateDirs=[], dns=None, **params ):
         self.root_dir = mkdtemp( prefix='%s-' % name )
-        copytree( '/etc', '%s/etc' % self.root_dir )
+        copytree( '%s/etc' % path.dirname(path.abspath(__file__)), '%s/etc' % self.root_dir )
         privateDirs = [
             ( '/etc', '%s/etc' % self.root_dir )
         ]
@@ -80,7 +81,7 @@ class DnsServer( Server ):
 
     def config( self, **params ):
         super( Server, self).config( **params )
-        self.service( '/usr/sbin/dnsmasq', 53 )
+        self.service( '/usr/sbin/dnsmasq -u root', 53 )
 
 
 class Services( Server ):
