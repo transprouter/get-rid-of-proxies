@@ -143,7 +143,11 @@ def start():
 if __name__ == '__main__':
     "Run network and drop user to cli"
     setLogLevel( 'info' )
-    net = start()
-    CLI( net )
-    net.stop()
-    cleanup()
+    try:
+        net = start()
+        try:
+            CLI( net )
+        finally:
+            net.stop()
+    finally:
+        cleanup()
