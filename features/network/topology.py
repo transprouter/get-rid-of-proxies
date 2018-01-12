@@ -113,14 +113,15 @@ class NetworkTopo( Topo ):
 
         dns = self.addHost( 'dns1', cls=DnsServer, ip='192.168.35.2/24',
             hosts=[
-                { 'name': 'srv1.local', 'ip': '192.168.35.10' },
-                { 'name': 'ws1.local',  'ip': '192.168.35.11' },
-                { 'name': 'ws2.local',  'ip': '192.168.35.12' }
+                { 'name': 'srv1.local',      'ip': '192.168.35.10' },
+                { 'name': 'ws1.local',       'ip': '192.168.35.11' },
+                { 'name': 'ws2.local',       'ip': '192.168.35.12' },
+                { 'name': 'srv2.public.net', 'ip': '10.0.0.10' }
             ]
         )
         localServer1 = self.addHost( 'srv1', cls=Services, ip='192.168.35.10/24', dns='192.168.35.2' )
-        workstation1 = self.addHost( 'ws1', ip='192.168.35.11/24' )
-        workstation2 = self.addHost( 'ws2', ip='192.168.35.12/24' )
+        workstation1 = self.addHost( 'ws1', ip='192.168.35.11/24', dns='192.168.35.2' )
+        workstation2 = self.addHost( 'ws2', ip='192.168.35.12/24', dns='192.168.35.2' )
 
         self.addLink( dns         , private )
         self.addLink( workstation1, private )

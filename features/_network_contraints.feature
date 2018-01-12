@@ -6,9 +6,9 @@ Feature: Network has constraints
     Then a HTTP timeout error occurred
 
     Examples:
-    | url                   |
-    | http://srv2.pub/lost  |
-    | https://srv2.pub/lost |
+    | url                         |
+    | http://srv2.public.net/lost |
+    | https://srv2.publc.net/lost |
 
   Scenario Outline: Some web resources are accessible directly
     Given my system hasn't transprouter
