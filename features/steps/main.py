@@ -1,5 +1,5 @@
 from behave import given, when, then
-from hamcrest import assert_that, equal_to, starts_with
+from hamcrest import assert_that, contains_string, equal_to, starts_with
 
 @given('my system has transprouter')
 def step(context):
@@ -11,11 +11,11 @@ def step(context):
 
 @when('I request the web resource at {url}')
 def step(context, url):
-    context.response_body = context.host.cmd('curl -iv -sSk --max-time 5 %s' % url)
+    context.response_body = context.host.cmd('curl -i -sSk --max-time 5 %s' % url)
 
 @then('the HTTP reponse body contains')
 def step(context):
-    assert_that(context.response_body, equal_to(context.text))
+    assert_that(context.response_body, contains_string(context.text))
 
 @then('a HTTP timeout error occurred')
 def step_impl(context):
