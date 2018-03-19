@@ -5,22 +5,19 @@ services:
 - docker
 
 before_install:
+- wget -O terraform.zip https://releases.hashicorp.com/terraform/0.11.4/terraform_0.11.4_linux_amd64.zip
+- sudo unzip terraform.zip -d /usr/local/bin
 - echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config
-- sh -c "cd integration-tests && docker-compose up -d --build"
 - rvm use 2
-- bundle install --gemfile integration-tests/Gemfile
-
-before_script:
-- docker ps
-- for i in $(seq 0 30) ; do sleep 1 && ssh root@localhost -p 2222 true && break ; done
+- bundle install --gemfile specs/Gemfile
 
 script:
 - go test -v ./...
-- go build && scp -P 2222 transprouter transprouter@localhost:~
-- sh -c "cd integration-tests && bundle exec cucumber"
+- go build
+- terraform init specs/
+- terraform apply -auto-approve specs/
+- sh -c "cd specs && bundle exec cucumber"
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 
-after_failure:
-- sh -c "cd integration-tests && docker-compose logs"

@@ -1,13 +1,9 @@
-require 'net/ssh'
-
-def sshexec(user, cmd)
-  Net::SSH.start('localhost', user, :port => 2222) do |ssh|
-    return ssh.exec!(cmd)
-  end
+def exec(user, cmd)
+  `docker exec -itu #{@user} workstation.private #{cmd}`
 end
 
 Given(/^my system has transprouter$/) do
-  @user = "proxied"
+  @user = "transprouter"
 end
 
 Given(/^my system hasn't transprouter$/) do
@@ -15,7 +11,7 @@ Given(/^my system hasn't transprouter$/) do
 end
 
 When(/^I request the web resource at (https?:.+)$/) do |url|
-  @http_response = sshexec(@user, "curl -sSk --max-time 5 #{url}")
+  @http_response = exec(@user, "curl -sSk --max-time 5 #{url}")
 end
 
 Then(/^the HTTP reponse body contains$/) do |expected_body|
@@ -27,7 +23,7 @@ Then(/^a HTTP timeout error occurred$/) do
 end
 
 When(/^I execute "([^"]*)" on (.+)$/) do |cmd, host|
-  @command_output = sshexec(@user, "ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@#{host} #{cmd}")
+  @command_output = exec(@user, "ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@#{host} #{cmd}")
 end
 
 Then(/^the command output is$/) do |expected_output|

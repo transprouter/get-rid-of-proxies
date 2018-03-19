@@ -13,12 +13,12 @@ Feature: Access network resources transparently
 
     Examples:
     | url                   |
-    | http://web.away/lost  |
-    | https://web.away/lost |
+    | http://webserver.public/lost  |
+    | https://webserver.public/lost |
 
   Scenario: Connecting to remote SSH server
     Given my system has transprouter
-    When I execute "echo -n hello world" on ssh.away
+    When I execute "echo -n hello world" on sshserver.public
     Then the command output is
     """
     hello world
