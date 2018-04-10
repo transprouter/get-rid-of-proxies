@@ -5,18 +5,16 @@ services:
 - docker
 
 before_install:
-- wget -O terraform.zip https://releases.hashicorp.com/terraform/0.11.4/terraform_0.11.4_linux_amd64.zip
-- sudo unzip terraform.zip -d /usr/local/bin
 - echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config
+- sudo pip install ansible docker-py dnspython
 - rvm use 2
 - bundle install --gemfile specs/Gemfile
 
 script:
 - go test -v ./...
 - go build
-- terraform init specs/
-- terraform apply -auto-approve specs/
-- sh -c "cd specs && bundle exec cucumber"
+- ansible-playbook specs/acceptance-infra.yml
+- sh -c "cd specs && bundle exec cucumber features/_*.feature"
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)

@@ -1,5 +1,5 @@
 def exec(user, cmd)
-  `docker exec -itu #{@user} workstation.private #{cmd}`
+  `docker exec -itu #{@user} tprt_priv_ws #{cmd}`
 end
 
 Given(/^my system has transprouter$/) do
@@ -11,7 +11,7 @@ Given(/^my system hasn't transprouter$/) do
 end
 
 When(/^I request the web resource at (https?:.+)$/) do |url|
-  @http_response = exec(@user, "curl -sSk --max-time 5 #{url}")
+  @http_response = exec(@user, "curl -sSk --max-time 2 #{url}")
 end
 
 Then(/^the HTTP reponse body contains$/) do |expected_body|
@@ -23,7 +23,7 @@ Then(/^a HTTP timeout error occurred$/) do
 end
 
 When(/^I execute "([^"]*)" on (.+)$/) do |cmd, host|
-  @command_output = exec(@user, "ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@#{host} #{cmd}")
+  @command_output = exec(@user, "ssh -o ConnectTimeout=2 -o StrictHostKeyChecking=no -o LogLevel=error root@#{host} #{cmd}")
 end
 
 Then(/^the command output is$/) do |expected_output|
@@ -31,5 +31,5 @@ Then(/^the command output is$/) do |expected_output|
 end
 
 Then(/^a SSH timeout error occurred$/) do
-  expect(@command_output).to match(/ssh: connect to host .* port 22: Connection timed out\r\n/)
+  expect(@command_output).to match(/ssh: connect to host .* port 22: Operation timed out\r\r\n/)
 end

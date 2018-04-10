@@ -1,0 +1,82 @@
+- hosts:
+  - localhost
+  tasks:
+  - name: pull latest images
+    docker_image:
+      name: "{{ item }}"
+    with_items:
+    - transprouter/dns
+    - transprouter/nginx
+    - transprouter/openssh
+    - transprouter/proxy
+    - transprouter/workstation
+
+  - name: create networks
+    docker_network:
+      name: "{{ item }}"
+    with_items:
+    - tprt_pub
+    - tprt_priv
+
+  - name: create public network containers
+    docker_container:
+      name: "{{ item.name }}"
+      image: "{{ item.image }}"
+      command: "{{ item.cmd|default(omit) }}"
+      purge_networks: yes
+      networks:
+      - name: tprt_pub
+    with_items:
+    - { name: tprt_pub_web, image: transprouter/nginx, cmd: public, dns: web }
+    - { name: tprt_pub_ssh, image: transprouter/openssh, dns: ssh }
+    register: public_containers
+
+  - name: create private dns container
+    docker_container:
+      name: tprt_priv_dns
+      image: transprouter/dns
+      purge_networks: yes
+      networks:
+      - name: tprt_priv
+    register: dns_container
+
+  - name: create private network containers
+    docker_container:
+      name: "{{ item.name }}"
+      image: "{{ item.image }}"
+      command: "{{ item.cmd|default(omit) }}"
+      purge_networks: yes
+      networks:
+      - name: tprt_priv
+      dns_servers:
+      - "{{ dns_container.ansible_facts.docker_container.NetworkSettings.Networks.tprt_priv.IPAddress }}"
+    with_items:
+    - { name: tprt_priv_proxy, image: transprouter/proxy, dns: proxy }
+    - { name: tprt_priv_ws, image: transprouter/workstation, dns: ws }
+    - { name: tprt_priv_web, image: transprouter/nginx, cmd: "private", dns: web }
+    - { name: tprt_priv_ssh, image: transprouter/openssh, dns: ssh  }
+    register: private_containers
+
+  - name: publish public services names to dns
+    nsupdate:
+      key_name: ansible
+      key_algorithm: hmac-sha1
+      key_secret: ww==
+      server: "{{ dns_container.ansible_facts.docker_container.NetworkSettings.Networks.tprt_priv.IPAddress }}"
+      zone: public
+      record: "{{ item.item.dns }}"
+      value: "{{ item.ansible_facts.docker_container.NetworkSettings.Networks.tprt_pub.IPAddress }}"
+      ttl: 86400
+    with_items: "{{ public_containers.results }}"
+
+  - name: publish private services names to dns
+    nsupdate:
+      key_name: ansible
+      key_algorithm: hmac-sha1
+      key_secret: ww==
+      server: "{{ dns_container.ansible_facts.docker_container.NetworkSettings.Networks.tprt_priv.IPAddress }}"
+      zone: private
+      record: "{{ item.item.dns }}"
+      value: "{{ item.ansible_facts.docker_container.NetworkSettings.Networks.tprt_priv.IPAddress }}"
+      ttl: 86400
+    with_items: "{{ private_containers.results }}"
