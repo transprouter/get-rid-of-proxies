@@ -18,6 +18,9 @@ script:
 
 after_failure:
 - docker logs transprouter_priv_ws
+- docker exec -it transprouter_priv_ws ping -c 1 web.public
+- docker exec -it transprouter_priv_ws ping -c 1 web.private
+- docker exec -it transprouter_priv_ws ping -c 1 proxy.private
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
