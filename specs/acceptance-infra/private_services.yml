@@ -29,6 +29,8 @@
     - name: transprouter_priv
     dns_servers:
     - "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
+    volumes:
+    - "{{ playbook_dir }}/../transprouter:/usr/local/bin/transprouter"
   register: priv_ws_container
 
 - name: create private webserver
