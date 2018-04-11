@@ -8,7 +8,7 @@ Feature: Access network resources transparently
     When I request the web resource at <url>
     Then the HTTP reponse body contains
     """
-    public sebserver
+    public webserver
     """
 
     Examples:

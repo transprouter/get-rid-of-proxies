@@ -1,5 +1,6 @@
-Feature: Netword has constraints
+Feature: Network has constraints
 
+  @slow
   Scenario Outline: Some web resources are protected behind a proxy
     Given my system hasn't transprouter
     When I request the web resource at <url>
@@ -23,6 +24,7 @@ Feature: Netword has constraints
     | http://web.private/lost  |
     | https://web.private/lost |
 
+  @slow
   Scenario: Some SSH servers are protected behind a proxy
     Given my system hasn't transprouter
     When I execute "echo hello world" on ssh.public
