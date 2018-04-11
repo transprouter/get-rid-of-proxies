@@ -1,0 +1,54 @@
+- name: create private dns service
+  docker_container:
+    name: transprouter_priv_dns
+    image: transprouter/dns
+    purge_networks: yes
+    networks:
+    - name: transprouter_priv
+  register: priv_dns_container
+
+- name: create private proxy service
+  docker_container:
+    name: transprouter_priv_proxy
+    image: transprouter/proxy
+    purge_networks: yes
+    networks:
+    - name: transprouter_priv
+    dns_servers:
+    - "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
+  register: priv_proxy_container
+
+- name: create private workstation
+  docker_container:
+    name: transprouter_priv_ws
+    image: transprouter/workstation
+    privileged: yes
+    purge_networks: yes
+    networks:
+    - name: transprouter_priv
+    dns_servers:
+    - "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
+  register: priv_ws_container
+
+- name: create private webserver
+  docker_container:
+    name: transprouter_priv_web
+    image: transprouter/nginx
+    command: "private webserver"
+    purge_networks: yes
+    networks:
+    - name: transprouter_priv
+    dns_servers:
+    - "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
+  register: priv_web_container
+
+- name: create private ssh service
+  docker_container:
+    name: transprouter_priv_ssh
+    image: transprouter/openssh
+    purge_networks: yes
+    networks:
+    - name: transprouter_priv
+    dns_servers:
+    - "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
+  register: priv_ssh_container

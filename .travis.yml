@@ -3,6 +3,8 @@ language: go
 sudo: required
 services:
 - docker
+env:
+- CGO_ENABLED=0
 
 before_install:
 - echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config

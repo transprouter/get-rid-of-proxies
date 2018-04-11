@@ -1,0 +1,6 @@
+- name: create networks
+  docker_network:
+    name: "{{ item }}"
+  with_items:
+  - transprouter_pub
+  - transprouter_priv

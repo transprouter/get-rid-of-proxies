@@ -1,0 +1,18 @@
+- name: create public webserver
+  docker_container:
+    name: transprouter_pub_web
+    image: transprouter/nginx
+    command: "public webserver"
+    purge_networks: yes
+    networks:
+    - name: transprouter_pub
+  register: pub_web_container
+
+- name: create public ssh server
+  docker_container:
+    name: transprouter_pub_ssh
+    image: transprouter/openssh
+    purge_networks: yes
+    networks:
+    - name: transprouter_pub
+  register: pub_ssh_container

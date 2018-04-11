@@ -1,5 +1,5 @@
 def exec(user, cmd)
-  `docker exec -itu #{@user} tprt_priv_ws #{cmd}`
+  `docker exec -itu #{@user} transprouter_priv_ws #{cmd}`
 end
 
 Given(/^my system has transprouter$/) do

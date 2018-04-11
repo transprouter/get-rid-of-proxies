@@ -1,0 +1,29 @@
+- name: publish public services names to dns
+  nsupdate:
+    key_name: ansible
+    key_algorithm: hmac-sha1
+    key_secret: ww==
+    server: "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
+    zone: public
+    record: "{{ item.record }}"
+    value: "{{ item.ip }}"
+    ttl: 86400
+  with_items:
+  - { record: web, ip: "{{ pub_web_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_pub.IPAddress }}" }
+  - { record: ssh, ip: "{{ pub_ssh_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_pub.IPAddress }}" }
+
+- name: publish private services names to dns
+  nsupdate:
+    key_name: ansible
+    key_algorithm: hmac-sha1
+    key_secret: ww==
+    server: "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
+    zone: private
+    record: "{{ item.record }}"
+    value: "{{ item.ip }}"
+    ttl: 86400
+  with_items:
+  - { record: proxy, ip: "{{ priv_proxy_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}" }
+  - { record: ws, ip: "{{ priv_ws_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}" }
+  - { record: web, ip: "{{ priv_web_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}" }
+  - { record: ssh, ip: "{{ priv_ssh_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}" }

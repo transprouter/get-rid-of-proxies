@@ -8,7 +8,7 @@ Feature: Access network resources transparently
     When I request the web resource at <url>
     Then the HTTP reponse body contains
     """
-    You are on a proxied webserver!
+    public sebserver
     """
 
     Examples:

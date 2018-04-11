@@ -15,7 +15,7 @@ Feature: Netword has constraints
     When I request the web resource at <url>
     Then the HTTP reponse body contains
     """
-    private
+    private webserver
     """
 
     Examples:
