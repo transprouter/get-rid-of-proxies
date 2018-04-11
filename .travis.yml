@@ -3,20 +3,18 @@ language: go
 sudo: required
 services:
 - docker
-env:
-- CGO_ENABLED=0
 
 before_install:
-- echo -e "Host localhost\n    StrictHostKeyChecking no" >> ~/.ssh/config
 - sudo pip install ansible docker-py dnspython
 - rvm use 2
-- bundle install --gemfile specs/Gemfile
+
+install:
+- make install
 
 script:
-- go test -v ./... -race -coverprofile=coverage.txt -covermode=atomic
-- go build
-- ansible-playbook specs/acceptance-infra.yml
-- sh -c "cd specs && bundle exec cucumber"
+- make test
+- make build
+- make specs
 
 after_failure:
 - docker logs transprouter_priv_ws
