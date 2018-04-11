@@ -14,6 +14,7 @@
     purge_networks: yes
     networks:
     - name: transprouter_priv
+    - name: transprouter_pub
     dns_servers:
     - "{{ priv_dns_container.ansible_facts.docker_container.NetworkSettings.Networks.transprouter_priv.IPAddress }}"
   register: priv_proxy_container
