@@ -1,0 +1,9 @@
+- name: pull latest images
+  docker_image:
+    name: "{{ item }}"
+  with_items:
+  - transprouter/dns
+  - transprouter/nginx
+  - transprouter/openssh
+  - transprouter/proxy
+  - transprouter/workstation

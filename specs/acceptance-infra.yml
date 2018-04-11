@@ -1,20 +1,12 @@
 - hosts:
   - localhost
   tasks:
-  - name: pull latest images
-    docker_image:
-      name: "{{ item }}"
-    with_items:
-    - transprouter/dns
-    - transprouter/nginx
-    - transprouter/openssh
-    - transprouter/proxy
-    - transprouter/workstation
 
-  - include_tasks: acceptance-infra/networks.yml
-  - include_tasks: acceptance-infra/public_services.yml
-  - include_tasks: acceptance-infra/private_services.yml
-  - include_tasks: acceptance-infra/publish_dns.yml
+  - import_tasks: acceptance-infra/pull_latest_images.yml
+  - import_tasks: acceptance-infra/networks.yml
+  - import_tasks: acceptance-infra/public_services.yml
+  - import_tasks: acceptance-infra/private_services.yml
+  - import_tasks: acceptance-infra/publish_dns.yml
 
   - name: deploy transprouter
     command: docker cp ../transprouter transprouter_priv_ws:/opt/transprouter/new
