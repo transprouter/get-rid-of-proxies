@@ -18,6 +18,9 @@ script:
 - ansible-playbook specs/acceptance-infra.yml
 - sh -c "cd specs && bundle exec cucumber"
 
+after_failure:
+- docker logs transprouter_priv_ws
+
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 
