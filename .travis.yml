@@ -16,7 +16,7 @@ script:
 - go test -v ./...
 - go build
 - ansible-playbook specs/acceptance-infra.yml
-- sh -c "cd specs && bundle exec cucumber features/_*.feature"
+- sh -c "cd specs && bundle exec cucumber"
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
