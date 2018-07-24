@@ -2,7 +2,7 @@ all: build test specs
 
 install:
 	go get -t -v ./...
-	pip install ansible docker-py dnspython
+	pip install --quiet ansible docker dnspython
 	bundle install --gemfile specs/Gemfile
 
 build:

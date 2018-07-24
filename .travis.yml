@@ -6,7 +6,7 @@ services:
 - docker
 
 before_install:
-- sudo pip install ansible docker-py dnspython
+- source ~/virtualenv/python3.6/bin/activate
 - rvm use 2
 
 install:
@@ -18,10 +18,16 @@ script:
 - make specs
 
 after_failure:
-- docker logs transprouter_priv_ws
 - docker exec -it transprouter_priv_ws ping -c 1 web.public
 - docker exec -it transprouter_priv_ws ping -c 1 web.private
 - docker exec -it transprouter_priv_ws ping -c 1 proxy.private
+- docker logs transprouter_priv_dns
+- docker logs transprouter_priv_proxy
+- docker logs transprouter_priv_ws
+- docker logs transprouter_priv_web
+- docker logs transprouter_priv_ssh
+- docker logs transprouter_pub_web
+- docker logs transprouter_pub_ssh
 
 after_success:
 - bash <(curl -s https://codecov.io/bash)
