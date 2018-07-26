@@ -2,14 +2,15 @@ all: build test specs
 
 install:
 	go get -t -v ./...
-	pip install --quiet ansible docker dnspython
+	pip install --quiet --upgrade ansible docker dnspython
 	bundle install --gemfile specs/Gemfile
 
 build:
 	CGO_ENABLED=0 go build
 
 test:
-	go test -v ./... -coverprofile=coverage.txt -covermode=atomic
+	go test -v -coverprofile=coverage.txt -covermode=atomic \
+		./proxy ./xnet
 
 acceptance-infra:
 	ansible-playbook specs/acceptance-infra.yml
