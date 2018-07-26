@@ -21,6 +21,7 @@
 
 - name: create private workstation
   docker_container:
+    restart: yes
     name: transprouter_priv_ws
     image: transprouter/workstation
     privileged: yes
