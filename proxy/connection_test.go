@@ -1,4 +1,4 @@
-package xnet
+package proxy
 
 import (
 	"bufio"

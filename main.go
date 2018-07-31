@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/transprouter/transprouter/proxy"
-	"github.com/transprouter/transprouter/xnet"
 	"github.com/spf13/viper"
+	"github.com/transprouter/transprouter/proxy"
 )
 
 func main() {
@@ -37,7 +36,7 @@ func main() {
 
 func handleConnection(conn *net.TCPConn) {
 
-	connInfo := xnet.Inspect(conn)
+	connInfo := proxy.Inspect(conn)
 
 	//p := new(proxy.DirectProxy)
 	p := proxy.NewHTTPProxy("proxy.private", 3128)

@@ -10,7 +10,7 @@ build:
 
 test:
 	go test -v -coverprofile=coverage.txt -covermode=atomic \
-		./proxy ./xnet
+		./proxy
 
 acceptance-infra:
 	ansible-playbook specs/acceptance-infra.yml

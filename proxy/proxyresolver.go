@@ -1,22 +1,18 @@
 package proxy
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
-	"sync"
-
-	"github.com/transprouter/transprouter/xnet"
-
-	"bufio"
-
 	"strings"
+	"sync"
 )
 
 // Proxy describes how to contact proxy server
 type Proxy interface {
-	Forward(conn *xnet.Connection)
+	Forward(conn *Connection)
 }
 
 // DirectProxy directly forwards connections
@@ -31,7 +27,7 @@ type HTTPProxy struct {
 	port uint16
 }
 
-func (p DirectProxy) Forward(conn *xnet.Connection) {
+func (p DirectProxy) Forward(conn *Connection) {
 	defer conn.Close()
 	remoteConn, err := net.Dial("tcp", conn.Dest.String())
 	defer remoteConn.Close()
@@ -49,7 +45,7 @@ func NewHTTPProxy(host string, port uint16) *HTTPProxy {
 	return p
 }
 
-func (p HTTPProxy) Forward(conn *xnet.Connection) {
+func (p HTTPProxy) Forward(conn *Connection) {
 	proxyConn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", p.host, p.port))
 	if err != nil {
 		fmt.Printf("ERROR opening connection with proxy at %s:%d: %s\n", p.host, p.port, err)
