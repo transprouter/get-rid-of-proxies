@@ -1,5 +1,5 @@
 package proxy
-
+/*
 import (
 	"bufio"
 	"bytes"
@@ -28,3 +28,4 @@ func tTestCanForwardHTTPToProxy(t *testing.T) {
 		t.Errorf("Response should contain perdu.com content but it was:\n%s\n", resp.String())
 	}
 }
+*/
