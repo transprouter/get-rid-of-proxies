@@ -1,4 +1,4 @@
-package testutilities
+package testutils
 
 import (
 	"bufio"

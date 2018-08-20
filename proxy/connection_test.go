@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"testing"
 
-	"github.com/transprouter/transprouter/testutilities"
+	"github.com/transprouter/transprouter/testutils"
 )
 
 func TestInspectCanDetectHTTP(t *testing.T) {
-	tcpConn, close := testutilities.TCPConnection(t, "GET /home HTTP/1.1")
+	tcpConn, close := testutils.TCPConnection(t, "GET /home HTTP/1.1")
 	defer close()
 	c := Inspect(tcpConn)
 	if c.Protocol != "HTTP" {
@@ -17,7 +17,7 @@ func TestInspectCanDetectHTTP(t *testing.T) {
 }
 
 func TestInspectCanDetectUnknownWhenNoData(t *testing.T) {
-	tcpConn, close := testutilities.TCPConnection(t, "")
+	tcpConn, close := testutils.TCPConnection(t, "")
 	defer close()
 	c := Inspect(tcpConn)
 	if c.Protocol != "unknown" {
@@ -26,7 +26,7 @@ func TestInspectCanDetectUnknownWhenNoData(t *testing.T) {
 }
 
 func TestInspectCanDetectUnknownWhenVeryFewData(t *testing.T) {
-	tcpConn, close := testutilities.TCPConnection(t, "few")
+	tcpConn, close := testutils.TCPConnection(t, "few")
 	defer close()
 	c := Inspect(tcpConn)
 	if c.Protocol != "unknown" {
@@ -35,7 +35,7 @@ func TestInspectCanDetectUnknownWhenVeryFewData(t *testing.T) {
 }
 
 func TestReaderAfterInspect(t *testing.T) {
-	tcpConn, close := testutilities.TCPConnection(t, "GET /home HTTP/1.1")
+	tcpConn, close := testutils.TCPConnection(t, "GET /home HTTP/1.1")
 	defer close()
 	c := Inspect(tcpConn)
 	s, _ := bufio.NewReader(c).ReadString('\n')
