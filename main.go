@@ -37,6 +37,7 @@ func main() {
 func handleConnection(conn *net.TCPConn) {
 
 	connInfo := proxy.Inspect(conn)
+	defer connInfo.Close()
 
 	//p := new(proxy.DirectProxy)
 	p := proxy.NewHTTPProxy("proxy.private", 3128)

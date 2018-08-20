@@ -47,6 +47,7 @@ func NewHTTPProxy(host string, port uint16) *HTTPProxy {
 
 func (p HTTPProxy) Forward(conn *Connection) {
 	proxyConn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", p.host, p.port))
+	defer proxyConn.Close()
 	if err != nil {
 		fmt.Printf("ERROR opening connection with proxy at %s:%d: %s\n", p.host, p.port, err)
 		return
@@ -86,9 +87,6 @@ func (p HTTPProxy) Forward(conn *Connection) {
 }
 
 func pipe(local io.ReadWriteCloser, remote io.ReadWriteCloser) {
-	defer local.Close()
-	defer remote.Close()
-
 	var wg sync.WaitGroup
 	wg.Add(2)
 
